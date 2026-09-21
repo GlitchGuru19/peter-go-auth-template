@@ -1,0 +1,24 @@
+# Binaries and Architecture-specific files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test artifacts and code coverage profiles
+*.test
+*.out
+*.coverprofile
+profile.cov
+
+# Dependency directories
+# (Only uncomment if you explicitly manage dependencies via vendoring)
+# vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Local environment configuration
+.env
+.env.*
