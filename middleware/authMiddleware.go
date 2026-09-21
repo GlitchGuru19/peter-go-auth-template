@@ -3,9 +3,8 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"peter-go-auth-template/initializers"
 	"strings"
-
-	"auth/initializers"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"

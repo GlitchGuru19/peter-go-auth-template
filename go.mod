@@ -1,4 +1,4 @@
-module auth
+module peter-go-auth-template
 
 go 1.27.1
 

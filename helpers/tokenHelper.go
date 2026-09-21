@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"auth/initializers"
+	"peter-go-auth-template/initializers"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"

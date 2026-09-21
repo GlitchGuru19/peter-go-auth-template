@@ -2,9 +2,8 @@ package routes
 
 import (
 	"net/http"
-
-	"auth/handlers/auth"
-	"auth/middleware"
+	"peter-go-auth-template/handlers/auth"
+	"peter-go-auth-template/middleware"
 
 	"github.com/gin-gonic/gin"
 )

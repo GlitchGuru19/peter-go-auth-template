@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-
-	"auth/database"
-	"auth/helpers"
-	"auth/initializers"
-	"auth/models"
+	"peter-go-auth-template/database"
+	"peter-go-auth-template/helpers"
+	"peter-go-auth-template/initializers"
+	"peter-go-auth-template/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"

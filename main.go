@@ -1,9 +1,9 @@
 package main
 
 import (
-	"auth/database"
-	"auth/initializers"
-	"auth/routes"
+	"peter-go-auth-template/database"
+	"peter-go-auth-template/initializers"
+	"peter-go-auth-template/routes"
 
 	"github.com/gin-gonic/gin"
 )

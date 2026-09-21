@@ -3,11 +3,10 @@ package auth
 import (
 	"context"
 	"net/http"
+	"peter-go-auth-template/database"
+	"peter-go-auth-template/helpers"
+	"peter-go-auth-template/models"
 	"strings"
-
-	"auth/database"
-	"auth/helpers"
-	"auth/models"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
