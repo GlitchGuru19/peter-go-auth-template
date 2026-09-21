@@ -13,15 +13,19 @@ import (
 // Other packages import these directly (e.g. initializers.Port)
 // instead of calling os.Getenv everywhere.
 var (
-	Port      string
-	MongoURI  string
-	SecretKey string
+	Port            string
+	MongoURI        string
+	SecretKey       string
+	ResendAPIKey    string
+	ResendFromEmail string
+	FrontendURL     string
 )
 
 // LoadEnvVariables reads the .env file and populates the package-level
 // variables above. It should be called once, before anything else runs.
 func LoadEnvVariables() {
 	log.Println("Loading environment variables...")
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file.")
@@ -38,6 +42,21 @@ func LoadEnvVariables() {
 	SecretKey = os.Getenv("SECRET_KEY")
 	if SecretKey == "" {
 		log.Fatal("SECRET_KEY is not set in the environment variables.")
+	}
+
+	ResendAPIKey = os.Getenv("RESEND_API_KEY")
+	if ResendAPIKey == "" {
+		log.Println("RESEND_API_KEY is not set in the environment variables.")
+	}
+
+	ResendFromEmail = os.Getenv("RESEND_FROM_EMAIL")
+	if ResendFromEmail == "" {
+		log.Println("RESEND_FROM_EMAIL is not set in the environment variables.")
+	}
+
+	FrontendURL = os.Getenv("FRONTEND_URL")
+	if FrontendURL == "" {
+		FrontendURL = "http://localhost:3000"
 	}
 
 	log.Println("Environment variables loaded successfully")

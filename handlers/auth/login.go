@@ -6,14 +6,13 @@ import (
 	"peter-go-auth-template/database"
 	"peter-go-auth-template/helpers"
 	"peter-go-auth-template/models"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Login handles POST /login – verifies credentials and issues both tokens.
+// Login handles POST /login — verifies credentials and issues both tokens.
 func Login(c *gin.Context) {
 	var input models.LoginInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -21,20 +20,15 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Normalize email.
-	input.Email = strings.ToLower(strings.TrimSpace(input.Email))
-
 	users := database.Database.Collection("users")
 
 	var user models.User
 	err := users.FindOne(context.TODO(), bson.M{"email": input.Email}).Decode(&user)
 	if err != nil {
-		// Don't reveal whether the email exists or the password is wrong.
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		return
 	}
 
-	// Compare the provided password with the stored hash.
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		return
@@ -42,7 +36,6 @@ func Login(c *gin.Context) {
 
 	userIDHex := user.ID.Hex()
 
-	// Generate access token (short-lived) and refresh token (long-lived).
 	accessToken, err := helpers.GenerateAccessToken(userIDHex, user.Role)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate access token"})
@@ -55,7 +48,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Store the refresh token on the user document so it can be revoked later.
+	// Store the refresh token on the user document — this is what makes
+	// revocation possible later (e.g. a /logout endpoint clearing this field).
 	_, err = users.UpdateOne(
 		context.TODO(),
 		bson.M{"_id": user.ID},
@@ -66,7 +60,6 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Return both tokens.
 	c.JSON(http.StatusOK, gin.H{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,

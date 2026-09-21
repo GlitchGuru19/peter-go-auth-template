@@ -8,15 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// SetupRoutes registers all routes on the given Gin engine.
 func SetupRoutes(router *gin.Engine) {
-	// Public, but rate-limited — these are the endpoints someone would
-	// try to brute-force (guessing passwords, spamming signups).
+	// Public, rate-limited.
 	router.POST("/signup", middleware.RateLimit(), auth.Signup)
 	router.POST("/login", middleware.RateLimit(), auth.Login)
 	router.POST("/refresh", middleware.RateLimit(), auth.Refresh)
+	router.POST("/forgot-password", middleware.RateLimit(), auth.ForgotPassword)
+	router.POST("/reset-password", middleware.RateLimit(), auth.ResetPassword)
 
-	// Protected — requires a valid access token.
+	// Protected.
 	router.GET("/me", middleware.RequireAuth, func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"userID": c.MustGet("userID"),

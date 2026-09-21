@@ -1,4 +1,4 @@
-# Auth Service — Go, Gin, MongoDB, JWT
+﻿# Auth Service — Go, Gin, MongoDB, JWT
 
 ![background](./misc/images/background.png)
 
