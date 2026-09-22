@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 	"net/http"
+	"strings"
+
 	"peter-go-auth-template/database"
 	"peter-go-auth-template/helpers"
 	"peter-go-auth-template/models"
@@ -20,17 +22,30 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	input.Email = strings.ToLower(strings.TrimSpace(input.Email))
+
 	users := database.Database.Collection("users")
 
 	var user models.User
 	err := users.FindOne(context.TODO(), bson.M{"email": input.Email}).Decode(&user)
 	if err != nil {
+		// Don't reveal whether the email exists or the password is wrong.
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		return
+	}
+
+	// Block unverified accounts. If you'd rather let them in and gate
+	// certain features later, delete this block and check EmailVerified
+	// in the handlers that need it.
+	if !user.EmailVerified {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "Email not verified — check your inbox for the code",
+		})
 		return
 	}
 
@@ -48,8 +63,6 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Store the refresh token on the user document — this is what makes
-	// revocation possible later (e.g. a /logout endpoint clearing this field).
 	_, err = users.UpdateOne(
 		context.TODO(),
 		bson.M{"_id": user.ID},

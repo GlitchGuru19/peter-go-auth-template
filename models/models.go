@@ -17,13 +17,20 @@ type User struct {
 	Role         string             `bson:"role" json:"role"`
 	RefreshToken string             `bson:"refresh_token" json:"-"` // never expose
 
+	// Email verification
+	EmailVerified bool `bson:"email_verified" json:"email_verified"`
+
+	// OTP fields. Cleared after successful verification.
+	OTPCodeHash  string    `bson:"otp_code_hash" json:"-"`
+	OTPExpiresAt time.Time `bson:"otp_expires_at" json:"-"`
+	OTPAttempts  int       `bson:"otp_attempts" json:"-"`
+
 	// Password reset fields. Cleared after a successful reset.
-	// We store the raw token here for simplicity, matching how the
-	// existing RefreshToken field works. When you move to the full
-	// production pattern, these move to their own collection with
-	// hashed values.
 	PasswordResetToken     string    `bson:"password_reset_token" json:"-"`
 	PasswordResetExpiresAt time.Time `bson:"password_reset_expires_at" json:"-"`
+
+	CreatedAt time.Time `bson:"created_at" json:"created_at"`
+	UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
 }
 
 // SignupInput is what we expect in the request body when creating an account.
@@ -53,4 +60,16 @@ type ForgotPasswordInput struct {
 type ResetPasswordInput struct {
 	Token       string `json:"token" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required,min=8"`
+}
+
+// SendOTPInput is the body of POST /send-otp.
+type SendOTPInput struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+// VerifyOTPInput is the body of POST /verify-otp.
+// Code is exactly 6 numeric digits — enforced by the validator.
+type VerifyOTPInput struct {
+	Email string `json:"email" binding:"required,email"`
+	Code  string `json:"code" binding:"required,len=6,numeric"`
 }

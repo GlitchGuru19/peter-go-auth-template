@@ -15,6 +15,8 @@ func SetupRoutes(router *gin.Engine) {
 	router.POST("/refresh", middleware.RateLimit(), auth.Refresh)
 	router.POST("/forgot-password", middleware.RateLimit(), auth.ForgotPassword)
 	router.POST("/reset-password", middleware.RateLimit(), auth.ResetPassword)
+	router.POST("/send-otp", middleware.RateLimit(), auth.SendOTP)
+	router.POST("/verify-otp", middleware.RateLimit(), auth.VerifyOTP)
 
 	// Protected.
 	router.GET("/me", middleware.RequireAuth, func(c *gin.Context) {

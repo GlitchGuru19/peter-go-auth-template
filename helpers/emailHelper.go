@@ -81,3 +81,48 @@ func SendPasswordResetEmail(to string, rawToken string) error {
 	log.Printf("[RESEND OK] to=%s id=%s", to, sent.Id)
 	return nil
 }
+
+// SendOTPEmail sends a 6-digit verification code to the given address.
+//
+// Same delivery constraints as SendPasswordResetEmail: until a domain
+// is verified in Resend, the sender must be onboarding@resend.dev and
+// the recipient must be your Resend signup email.
+//
+// SECURITY: never log the raw code in production.
+func SendOTPEmail(to string, code string) error {
+	client := resend.NewClient(initializers.ResendAPIKey)
+
+	htmlBody := fmt.Sprintf(`
+		<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
+			<h2 style="color: #111;">Verify your email</h2>
+			<p style="color: #444; line-height: 1.6;">
+				Enter this code to finish setting up your account.
+				It expires in 10 minutes and can only be used once.
+			</p>
+			<div style="background: #f5f5f5; padding: 20px; border-radius: 6px;
+			            margin: 24px 0; text-align: center;">
+				<span style="font-family: monospace; font-size: 32px; font-weight: 700;
+				             letter-spacing: 8px; color: #111;">%s</span>
+			</div>
+			<p style="color: #888; font-size: 13px; line-height: 1.6;">
+				If you didn't create an account, you can safely ignore this email.
+			</p>
+		</div>
+	`, code)
+
+	params := &resend.SendEmailRequest{
+		From:    initializers.ResendFromEmail,
+		To:      []string{to},
+		Subject: "Your verification code",
+		Html:    htmlBody,
+	}
+
+	sent, err := client.Emails.Send(params)
+	if err != nil {
+		log.Printf("[RESEND ERROR] OTP to=%s err=%v", to, err)
+		return err
+	}
+
+	log.Printf("[RESEND OK] OTP to=%s id=%s", to, sent.Id)
+	return nil
+}
